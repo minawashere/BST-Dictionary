@@ -99,6 +99,7 @@ Node* rotate_right(Node* old_root)
     return new_root;
 }
 
+
 Node* rotate_left(Node* old_root)
 {
     Node* new_root = old_root->right;
