@@ -56,8 +56,8 @@ Node* minimum(Node* root)
     //     current = (Node*)current->left;
     // }
     if (root->left == NULL)
-         return root;
-     return minimum((Node*)root->left);
+        return root;
+    return minimum((Node*)root->left);
 }
 
 
@@ -70,11 +70,12 @@ Node* maximum(Node* root)
     {
         if (current->right == NULL)
             return current;
-        current = current->right;
+        current = (Node*)current->right;
     }
+    return NUll;
 }
 
-int height(Node* root)
+int height(const Node* root)
 {
     if (root == NULL)
         return 0;
@@ -85,15 +86,15 @@ int get_balance(const Node* root)
 {
     if (root == NULL)
         return 0;
-    return height(root->left) - height(root->right);
+    return height((Node*)root->left) - height((Node*)root->right);
 }
 
 Node* rotate_right(Node* old_root)
 {
-    Node* new_root = old_root->left;
-    Node* t2 = new_root->right;
-    new_root->right = old_root;
-    old_root->left = t2;
+    Node* new_root = (Node*)old_root->left;
+    Node* t2 = (Node*)new_root->right;
+    new_root->right = (struct Node*)old_root;
+    old_root->left = (struct Node*)t2;
     new_root->height = 1 + max(height(new_root->left), height(new_root->right));
     old_root->height = 1 + max(height(old_root->left), height(old_root->right));
     return new_root;
@@ -102,11 +103,11 @@ Node* rotate_right(Node* old_root)
 
 Node* rotate_left(Node* old_root)
 {
-    Node* new_root = old_root->right;
-    Node* t2 = new_root->left;
+    Node* new_root = (Node*)old_root->right;
+    Node* t2 = (Node*)new_root->left;
 
-    new_root->left = old_root;
-    old_root->right = t2;
+    new_root->left = (struct Node*)old_root;
+    old_root->right = (struct Node*)t2;
 
     new_root->height = 1 + max(height(new_root->left), height(new_root->right));
     old_root->height = 1 + max(height(old_root->left), height(old_root->right));
@@ -118,9 +119,9 @@ Node* insert_node(Node* root, const int key)
     if (root == NULL)
         return construct_tree(key);
     if (key < root->key)
-        root->left = insert_node(root->left, key);
+        root->left = (struct Node*)insert_node((Node*)root->left, key);
     if (key > root->key)
-        root->right = insert_node(root->right, key);
+        root->right = (struct Node*)insert_node((Node*)root->right, key);
     root->height = 1 + max(height(root->right), height(root->left));
     return root;
 }
@@ -130,9 +131,9 @@ Node* delete_node(Node* root, const int key)
     if (root == NULL)
         return NULL;
     if (key > root->key)
-        root->right = delete_node(root->right, key);
+        root->right = (struct Node*)delete_node((Node*)root->right, key);
     else if (key < root->key)
-        root->left = delete_node(root->left, key);
+        root->left = (struct Node*)delete_node((Node*)root->left, key);
     else if (root->key == key)
     {
         if (root->left == NULL && root->right == NULL)
@@ -152,28 +153,28 @@ Node* delete_node(Node* root, const int key)
             free(root);
             return temp;
         }
+
         const Node* temp = minimum((Node*)root->right);
-        root->key = temp->key;
-        root->right = delete_node((Node*)root->right, temp->key);
+        if (temp)
+        {
+            root->key = temp->key;
+            root->right = (struct Node*)delete_node((Node*)root->right, temp->key);
+        }
     }
+
     return root;
 }
-
-
-
-
 
 void print_tree(const Node* root)
 {
     if (root == NULL)
-        return ;
+        return;
     if (root->left != NULL)
         print_tree((Node*)root->left);
     printf("%d ", root->key);
     if (root->right != NULL)
         print_tree((Node*)root->right);
 }
-
 
 
 int main()
@@ -191,4 +192,3 @@ int main()
     destruct_tree(root);
     return 0;
 }
-
