@@ -72,7 +72,7 @@ Node* maximum(Node* root)
             return current;
         current = (Node*)current->right;
     }
-    return NUll;
+    return NULL;
 }
 
 int height(const Node* root)
