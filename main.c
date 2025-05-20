@@ -1,21 +1,23 @@
 #include <stdio.h>
     #include <stdlib.h>
+#include <string.h>
 
-    #define min(a,b) (((a) < (b)) ? (a) : (b))
+#define min(a,b) (((a) < (b)) ? (a) : (b))
     #define max(a,b) (((a) > (b)) ? (a) : (b))
 
     struct Node
     {
-        int key;
+        char* data;
         struct Node* left;
         struct Node* right;
         int height;
     };
 
-    struct Node* construct_tree(int key)
+    struct Node* construct_tree(char* data)
     {
         struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
-        new_node->key = key;
+        new_node->data = malloc(strlen(data) + 1);
+        strcpy(new_node->data, data);
         new_node->left = NULL;
         new_node->right = NULL;
         new_node->height = 1;
@@ -106,10 +108,10 @@
         return new_root;
     }
 
-    struct Node* insert_node(struct Node* root, const int key)
+    struct Node* insert_node(struct Node* root, char* data)
     {
         if (root == NULL)
-            return construct_tree(key);
+            return construct_tree(data);
         if (key < root->key)
             root->left = insert_node(root->left, key);
         if (key > root->key)
