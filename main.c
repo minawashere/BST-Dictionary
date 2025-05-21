@@ -1,5 +1,6 @@
 #include <stdio.h>
-    #include <stdlib.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 
 #define min(a,b) (((a) < (b)) ? (a) : (b))
@@ -170,6 +171,20 @@
             print_tree(root->right);
     }
 
+    char *StrToLower(char *str)
+    {
+        char *p = malloc(strlen(str) + 1);
+        char *result = p;
+        while (*str)
+        {
+            *p = tolower(*str);
+            p++;
+            str++;
+        }
+        *p = '\0';
+        return result;
+    }
+
     int main()
     {
         FILE* f = fopen("Dictionary.txt", "r");
@@ -177,14 +192,14 @@
 
         char* temp = malloc(sizeof(char) * 100);
         fscanf(f, "%s", temp);
-        struct Node* treeRoot = construct_tree(temp);
+        struct Node* treeRoot = construct_tree(StrToLower(temp));
 
         char x = 'a';
 
         while (x != EOF)
         {
             fscanf(f, "%s", temp);
-            insert_node(treeRoot, temp);
+            insert_node(treeRoot, StrToLower(temp));
             x = fgetc(f);
         }
         fclose(f);
