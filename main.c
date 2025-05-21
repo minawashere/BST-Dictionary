@@ -35,14 +35,14 @@
         free(node);
     }
 
-    struct Node* search_tree(struct Node* root, const int key)
+    struct Node* search_tree(struct Node* root, const char* key)
     {
         if (root == NULL) return NULL;
-        if (root->key == key)
+        if (strcmp(key, root->data) == 0)
             return root;
-        if (key < root->key)
+        if (strcmp(key, root->data) < 0)
             return search_tree(root->left, key);
-        if (key > root->key)
+        if (strcmp(key, root->data) > 0)
             return search_tree(root->right, key);
         return NULL;
     }
@@ -112,23 +112,23 @@
     {
         if (root == NULL)
             return construct_tree(data);
-        if (key < root->key)
-            root->left = insert_node(root->left, key);
-        if (key > root->key)
-            root->right = insert_node(root->right, key);
+        if (strcmp(data, root->data) < 0)
+            root->left = insert_node(root->left, data);
+        if (strcmp(data, root->data) > 0)
+            root->right = insert_node(root->right, data);
         root->height = 1 + max(height(root->right), height(root->left));
         return root;
     }
 
-    struct Node* delete_node(struct Node* root, const int key)
+    struct Node* delete_node(struct Node* root, const char* key)
     {
         if (root == NULL)
             return NULL;
-        if (key > root->key)
+        if (strcmp(key, root->data) > 0)
             root->right = delete_node(root->right, key);
-        else if (key < root->key)
+        else if (strcmp(key, root->data) < 0)
             root->left = delete_node(root->left, key);
-        else if (root->key == key)
+        else if (strcmp(root->data , key) == 0)
         {
             if (root->left == NULL && root->right == NULL)
             {
@@ -151,8 +151,8 @@
             const struct Node* temp = minimum(root->right);
             if (temp)
             {
-                root->key = temp->key;
-                root->right = delete_node(root->right, temp->key);
+                root->data = temp->data;
+                root->right = delete_node(root->right, temp->data);
             }
         }
 
@@ -165,23 +165,41 @@
             return;
         if (root->left != NULL)
             print_tree(root->left);
-        printf("%d ", root->key);
+        printf("%s \n", root->data);
         if (root->right != NULL)
             print_tree(root->right);
     }
 
     int main()
     {
-        struct Node* root = construct_tree(15);
-        root = insert_node(root, 10);
-        root = insert_node(root, 5);
-        root = insert_node(root, 20);
-        root = insert_node(root, 8);
-        root = insert_node(root, 11);
+        FILE* f = fopen("Dictionary.txt", "r");
+        if (f == NULL) printf("File does not exist\n");
+
+        char* temp = malloc(sizeof(char) * 100);
+        fscanf(f, "%s", temp);
+        struct Node* treeRoot = construct_tree(temp);
+
+        char x = 'a';
+
+        while (x != EOF)
+        {
+            fscanf(f, "%s", temp);
+            insert_node(treeRoot, temp);
+            x = fgetc(f);
+        }
+        fclose(f);
+        print_tree(treeRoot);
+        
+        /*struct Node* root = construct_tree("ahmed");
+        root = insert_node(root, "mina");
+        root = insert_node(root, "rabie");
+        root = insert_node(root, "youssef");
+        root = insert_node(root, "mahmoud");
+        root = insert_node(root, "metawie");
         print_tree(root);
         printf("\n");
-        root = delete_node(root, 20);
+        root = delete_node(root, "mina");
         print_tree(root);
-        destruct_tree(root);
+        destruct_tree(root);*/
         return 0;
     }
