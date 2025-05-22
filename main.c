@@ -42,9 +42,18 @@
         if (strcmp(key, root->data) == 0)
             return root;
         if (strcmp(key, root->data) < 0)
-            return search_tree(root->left, key);
+        {
+            if (root->left)
+                return search_tree(root->left, key);
+            return root;
+
+        }
         if (strcmp(key, root->data) > 0)
-            return search_tree(root->right, key);
+        {
+            if (root->right)
+                return search_tree(root->right, key);
+            return root;
+        }
         return NULL;
     }
 
@@ -160,6 +169,17 @@
         return root;
     }
 
+    struct Node* predecessor(struct Node* root)
+    {
+        if (root == NULL) return NULL;
+        return maximum(root->left);
+    }
+    struct Node* successor(struct Node* root)
+    {
+        if (root == NULL) return NULL;
+        return minimum(root->right);
+    }
+
     void print_tree(const struct Node* root)
     {
         if (root == NULL)
@@ -210,15 +230,34 @@
         while (token != NULL)
         {
             struct Node* tempNode = search_tree(treeRoot, StrToLower(token));
-            if (tempNode == NULL)
+            if (strcmp(StrToLower(tempNode->data),StrToLower(token)) != 0)
             {
-                printf("Word %s -- ", token);   
-                printf("Invalid word\n");
+                printf("Word '%s' -- ", token);   
+                printf("Invalid word -- ");
                 
+                /*
+                struct Node* node = construct_tree(token);
+                FILE* f1 = fopen("Dictionary.txt", "r");
+                if (f1 == NULL) printf("File does not exist\n");
+                x = 'a';
+
+                while (x != EOF)
+                {
+                    fscanf(f1, "%s", temp);
+                    insert_node(node, StrToLower(temp));
+                    x = fgetc(f1);
+                }
+                fclose(f1);
+                */
+                
+                
+                printf("Suggestions: '%s', '%s', '%s'\n", tempNode->data, predecessor(node)->data, successor(node)->data);
+                printf("Suggestions: '%s'\n", tempNode->data);
+
             }
             else
             {
-                printf("Word %s -- ", token);   
+                printf("Word '%s' -- ", token);   
                 printf("Valid word\n");
             }
             token = strtok(NULL, " ");
