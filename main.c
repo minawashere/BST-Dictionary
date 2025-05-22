@@ -190,10 +190,9 @@
         FILE* f = fopen("Dictionary.txt", "r");
         if (f == NULL) printf("File does not exist\n");
 
-        char* temp = malloc(sizeof(char) * 100);
+        char temp[100];
         fscanf(f, "%s", temp);
         struct Node* treeRoot = construct_tree(StrToLower(temp));
-
         char x = 'a';
 
         while (x != EOF)
@@ -203,7 +202,29 @@
             x = fgetc(f);
         }
         fclose(f);
-        print_tree(treeRoot);
+        
+        char input[200];
+        printf("Enter a sentence: ");
+        gets(input);
+        char* token = strtok(input, " ");
+        while (token != NULL)
+        {
+            struct Node* tempNode = search_tree(treeRoot, StrToLower(token));
+            if (tempNode == NULL)
+            {
+                printf("Word %s -- ", token);   
+                printf("Invalid word\n");
+                
+            }
+            else
+            {
+                printf("Word %s -- ", token);   
+                printf("Valid word\n");
+            }
+            token = strtok(NULL, " ");
+        }
+        
+
         
         /*struct Node* root = construct_tree("ahmed");
         root = insert_node(root, "mina");
