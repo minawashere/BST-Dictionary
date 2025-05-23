@@ -284,6 +284,7 @@ void print_tree(const struct Node* root)
 
 int main()
 {
+    int i = 0;
     FILE* f = fopen("Dictionary.txt", "r");
     if (!f)
     {
@@ -295,9 +296,17 @@ int main()
     char temp[100];
 
     while (fscanf(f, "%99s", temp) == 1)
+    {
         treeRoot = insert_node(treeRoot, temp);
+        i++;
+    }
 
     fclose(f);
+    printf("-----------------------------------------\n");
+    printf("Dictionary Loaded Successfully\n");
+    printf("Tree size: %d nodes\n", i);
+    printf("Height of the tree is: %d nodes\n", height(treeRoot));
+    printf("-----------------------------------------\n");
 
     char input[200];
     printf("Enter a sentence: ");
