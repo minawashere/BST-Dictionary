@@ -47,15 +47,15 @@
     struct Node* search_tree(struct Node* root, const char* key)
     {
         if (root == NULL) return NULL;
-        if (strcmp(key, root->data) == 0)
+        if (strcasecmp(key, root->data) == 0)
             return root;
-        if (strcmp(key, root->data) < 0)
+        if (strcasecmp(key, root->data) < 0)
         {
             if (root->left)
                 return search_tree(root->left, key);
             return root;
         }
-        if (strcmp(key, root->data) > 0)
+        if (strcasecmp(key, root->data) > 0)
         {
             if (root->right)
                 return search_tree(root->right, key);
@@ -124,9 +124,9 @@ struct Node* insert_node(struct Node* root, char* data)
         if (root == NULL)
             return construct_tree(data);
         
-        if (strcmp(data, root->data) < 0)
+        if (strcasecmp(data, root->data) < 0)
             root->left = insert_node(root->left, data);
-        else if (strcmp(data, root->data) > 0)
+        else if (strcasecmp(data, root->data) > 0)
             root->right = insert_node(root->right, data);
         else
             return root;
@@ -135,18 +135,18 @@ struct Node* insert_node(struct Node* root, char* data)
 
         int balance = get_balance(root);
         
-        if (balance > 1 && strcmp(data, root->left->data) < 0)
+        if (balance > 1 && strcasecmp(data, root->left->data) < 0)
             return rotate_right(root);
 
-        if (balance < -1 && strcmp(data, root->right->data) > 0)
+        if (balance < -1 && strcasecmp(data, root->right->data) > 0)
             return rotate_left(root);
 
-        if (balance > 1 && strcmp(data, root->left->data) > 0) {
+        if (balance > 1 && strcasecmp(data, root->left->data) > 0) {
             root->left = rotate_left(root->left);
             return rotate_right(root);
         }
 
-        if (balance < -1 && strcmp(data, root->right->data) < 0) {
+        if (balance < -1 && strcasecmp(data, root->right->data) < 0) {
             root->right = rotate_right(root->right);
             return rotate_left(root);
         }
@@ -158,11 +158,11 @@ struct Node* insert_node(struct Node* root, char* data)
     {
         if (root == NULL)
             return NULL;
-        if (strcmp(key, root->data) > 0)
+        if (strcasecmp(key, root->data) > 0)
             root->right = delete_node(root->right, key);
-        else if (strcmp(key, root->data) < 0)
+        else if (strcasecmp(key, root->data) < 0)
             root->left = delete_node(root->left, key);
-        else if (strcmp(root->data , key) == 0)
+        else if (strcasecmp(root->data , key) == 0)
         {
             if (root->left == NULL && root->right == NULL)
             {
@@ -242,14 +242,16 @@ struct Node* insert_node(struct Node* root, char* data)
         
         char input[200];
         printf("Enter a sentence: ");
-        gets(input);
+        fgets(input, 200, stdin);
+        input[strlen(input) - 1] = '\0';
+
         toLowerCase(input);
         char* token = strtok(input, " ");
         while (token != NULL)
         {
             struct Node* tempNode = search_tree(treeRoot, token);
             insert_node(treeRoot, "i");
-            if (strcmp(tempNode->data,token) != 0)
+            if (strcasecmp(tempNode->data,token) != 0)
             {
                 printf("Word '%s' -- ", token);   
                 printf("Invalid word -- ");
