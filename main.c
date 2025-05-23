@@ -312,7 +312,6 @@ int main()
     printf("Enter a sentence: ");
     fgets(input, sizeof(input), stdin);
     input[strcspn(input, "\n")] = '\0';
-    // toLowerCase(input);
 
     char* token = strtok(input, " ");
     while (token)
