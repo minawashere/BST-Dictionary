@@ -276,12 +276,6 @@ void print_tree(const struct Node* root)
         print_tree(root->right);
 }
 
-// void toLowerCase(char* str)
-// {
-//     for (int i = 0; str[i]; i++)
-//         str[i] = tolower((unsigned char)str[i]);
-// }
-
 int main()
 {
     int i = 0;
@@ -304,8 +298,8 @@ int main()
     fclose(f);
     printf("-----------------------------------------\n");
     printf("Dictionary Loaded Successfully\n");
-    printf("Tree size: %d nodes\n", i);
-    printf("Height of the tree is: %d nodes\n", height(treeRoot));
+    printf("Number of nodes: %d nodes\n", i);
+    printf("Height: %d \n", height(treeRoot));
     printf("-----------------------------------------\n");
 
     char input[200];
