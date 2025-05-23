@@ -87,6 +87,64 @@ struct Node* maximum(struct Node* root)
     return NULL;
 }
 
+struct Node* find_predecessor(struct Node* root, struct Node* node)
+{
+    if (!node) return NULL;
+
+    if (node->left)
+        return maximum(node->left);
+
+    struct Node* predecessor = NULL;
+    struct Node* current = root;
+
+    while (current)
+    {
+        if (strcasecmp(node->data, current->data) > 0)
+        {
+            predecessor = current;
+            current = current->right;
+        }
+        else if (strcasecmp(node->data, current->data) < 0)
+        {
+            current = current->left;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return predecessor;
+}
+
+struct Node* find_successor(struct Node* root, struct Node* node)
+{
+    if (!node) return NULL;
+
+    if (node->right)
+        return minimum(node->right);
+
+    struct Node* successor = NULL;
+    struct Node* current = root;
+
+    while (current)
+    {
+        if (strcasecmp(node->data, current->data) < 0)
+        {
+            successor = current;
+            current = current->left;
+        }
+        else if (strcasecmp(node->data, current->data) > 0)
+        {
+            current = current->right;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return successor;
+}
+
 
 int get_balance(const struct Node* root)
 {
@@ -227,7 +285,7 @@ void toLowerCase(char* str)
 int main()
 {
     FILE* f = fopen("Dictionary.txt", "r");
-    if (f == NULL)
+    if (!f)
     {
         printf("File does not exist\n");
         return 1;
@@ -235,38 +293,43 @@ int main()
 
     struct Node* treeRoot = NULL;
     char temp[100];
-    
+
     while (fscanf(f, "%99s", temp) == 1)
     {
         toLowerCase(temp);
-        treeRoot = insert_node(treeRoot, temp); 
+        treeRoot = insert_node(treeRoot, temp);
     }
     fclose(f);
 
     char input[200];
     printf("Enter a sentence: ");
-    if (fgets(input, sizeof(input), stdin) == NULL)
-    {
-        printf("Error reading input\n");
-        destruct_tree(treeRoot);
-        return 1;
-    }
+    fgets(input, sizeof(input), stdin);
     input[strcspn(input, "\n")] = '\0';
-
     toLowerCase(input);
+
     char* token = strtok(input, " ");
-    while (token != NULL)
+    while (token)
     {
         struct Node* tempNode = search_tree(treeRoot, token);
-        if (tempNode == NULL || strcasecmp(tempNode->data, token) != 0)
+
+        if (!tempNode || strcasecmp(tempNode->data, token) != 0)
         {
-            printf("Word '%s' -- Invalid word -- ", token);
-            printf("Did you mean '%s'?\n", tempNode->data);
+            printf("Word '%s' -- Invalid. Suggestions: ", token);
+
+            struct Node* A = tempNode;
+            struct Node* B = A ? find_predecessor(treeRoot, A) : NULL;
+            struct Node* C = A ? find_successor(treeRoot, A) : NULL;
+
+            printf("'%s'", A ? A->data : "");
+            if (B) printf(", '%s'", B->data);
+            if (C) printf(", '%s'", C->data);
+            printf("\n");
         }
         else
         {
-            printf("Word '%s' -- Valid word\n", token);
+            printf("Word '%s' -- Valid\n", token);
         }
+
         token = strtok(NULL, " ");
     }
 
