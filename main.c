@@ -14,6 +14,14 @@
         int height;
     };
 
+
+    int height(const struct Node* root)
+    {
+        if (root == NULL)
+            return 0;
+        return root->height;
+    }
+
     struct Node* construct_tree(char* data)
     {
         struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
@@ -46,7 +54,6 @@
             if (root->left)
                 return search_tree(root->left, key);
             return root;
-
         }
         if (strcmp(key, root->data) > 0)
         {
@@ -80,12 +87,6 @@
         return NULL;
     }
 
-    int height(const struct Node* root)
-    {
-        if (root == NULL)
-            return 0;
-        return root->height;
-    }
 
     int get_balance(const struct Node* root)
     {
@@ -100,8 +101,8 @@
         struct Node* t2 = new_root->right;
         new_root->right = old_root;
         old_root->left = t2;
-        new_root->height = 1 + max(height(new_root->left), height(new_root->right));
         old_root->height = 1 + max(height(old_root->left), height(old_root->right));
+        new_root->height = 1 + max(height(new_root->left), height(new_root->right));
         return new_root;
     }
 
@@ -113,20 +114,43 @@
         new_root->left = old_root;
         old_root->right = t2;
 
-        new_root->height = 1 + max(height(new_root->left), height(new_root->right));
         old_root->height = 1 + max(height(old_root->left), height(old_root->right));
+        new_root->height = 1 + max(height(new_root->left), height(new_root->right));
         return new_root;
     }
 
-    struct Node* insert_node(struct Node* root, char* data)
+struct Node* insert_node(struct Node* root, char* data)
     {
         if (root == NULL)
             return construct_tree(data);
+        
         if (strcmp(data, root->data) < 0)
             root->left = insert_node(root->left, data);
-        if (strcmp(data, root->data) > 0)
+        else if (strcmp(data, root->data) > 0)
             root->right = insert_node(root->right, data);
+        else
+            return root;
+        
         root->height = 1 + max(height(root->right), height(root->left));
+
+        int balance = get_balance(root);
+        
+        if (balance > 1 && strcmp(data, root->left->data) < 0)
+            return rotate_right(root);
+
+        if (balance < -1 && strcmp(data, root->right->data) > 0)
+            return rotate_left(root);
+
+        if (balance > 1 && strcmp(data, root->left->data) > 0) {
+            root->left = rotate_left(root->left);
+            return rotate_right(root);
+        }
+
+        if (balance < -1 && strcmp(data, root->right->data) < 0) {
+            root->right = rotate_right(root->right);
+            return rotate_left(root);
+        }
+
         return root;
     }
 
@@ -191,18 +215,9 @@
             print_tree(root->right);
     }
 
-    char *StrToLower(char *str)
-    {
-        char *p = malloc(strlen(str) + 1);
-        char *result = p;
-        while (*str)
-        {
-            *p = tolower(*str);
-            p++;
-            str++;
-        }
-        *p = '\0';
-        return result;
+    void toLowerCase(char *str) {
+        for (int i = 0; str[i]; i++)
+            str[i] = tolower((unsigned char)str[i]);
     }
 
     int main()
@@ -212,13 +227,15 @@
 
         char temp[100];
         fscanf(f, "%s", temp);
-        struct Node* treeRoot = construct_tree(StrToLower(temp));
+        toLowerCase(temp); //TODO MINA LOOK AT THIS I AM CONVERTING TO LOWER AHOO
+        struct Node* treeRoot = construct_tree(temp);
         char x = 'a';
 
         while (x != EOF)
         {
             fscanf(f, "%s", temp);
-            insert_node(treeRoot, StrToLower(temp));
+            toLowerCase(temp); //TODO MINA LOOK AT THIS
+            insert_node(treeRoot, temp);
             x = fgetc(f);
         }
         fclose(f);
@@ -226,11 +243,13 @@
         char input[200];
         printf("Enter a sentence: ");
         gets(input);
+        toLowerCase(input);
         char* token = strtok(input, " ");
         while (token != NULL)
         {
-            struct Node* tempNode = search_tree(treeRoot, StrToLower(token));
-            if (strcmp(StrToLower(tempNode->data),StrToLower(token)) != 0)
+            struct Node* tempNode = search_tree(treeRoot, token);
+            insert_node(treeRoot, "i");
+            if (strcmp(tempNode->data,token) != 0)
             {
                 printf("Word '%s' -- ", token);   
                 printf("Invalid word -- ");
@@ -251,7 +270,7 @@
                 */
                 
                 
-                printf("Suggestions: '%s', '%s', '%s'\n", tempNode->data, predecessor(node)->data, successor(node)->data);
+                //printf("Suggestions: '%s', '%s', '%s'\n", tempNode->data, predecessor(node)->data, successor(node)->data);
                 printf("Suggestions: '%s'\n", tempNode->data);
 
             }
