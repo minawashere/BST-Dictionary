@@ -4,298 +4,272 @@
 #include <string.h>
 
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-    #define max(a,b) (((a) > (b)) ? (a) : (b))
+#define max(a,b) (((a) > (b)) ? (a) : (b))
 
-    struct Node
+struct Node
+{
+    char* data;
+    struct Node* left;
+    struct Node* right;
+    int height;
+};
+
+
+int height(const struct Node* root)
+{
+    if (root == NULL)
+        return 0;
+    return root->height;
+}
+
+struct Node* construct_tree(char* data)
+{
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = malloc(strlen(data) + 1);
+    strcpy(new_node->data, data);
+    new_node->left = NULL;
+    new_node->right = NULL;
+    new_node->height = 1;
+    return new_node;
+}
+
+void destruct_tree(struct Node* node)
+{
+    if (node == NULL)
+        return;
+    if (node->left)
+        destruct_tree(node->left);
+    if (node->right)
+        destruct_tree(node->right);
+    free(node);
+}
+
+struct Node* search_tree(struct Node* root, const char* key)
+{
+    if (root == NULL) return NULL;
+    if (strcasecmp(key, root->data) == 0)
+        return root;
+    if (strcasecmp(key, root->data) < 0)
     {
-        char* data;
-        struct Node* left;
-        struct Node* right;
-        int height;
-    };
-
-
-    int height(const struct Node* root)
-    {
-        if (root == NULL)
-            return 0;
-        return root->height;
+        if (root->left)
+            return search_tree(root->left, key);
+        return root;
     }
-
-    struct Node* construct_tree(char* data)
+    if (strcasecmp(key, root->data) > 0)
     {
-        struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
-        new_node->data = malloc(strlen(data) + 1);
-        strcpy(new_node->data, data);
-        new_node->left = NULL;
-        new_node->right = NULL;
-        new_node->height = 1;
-        return new_node;
+        if (root->right)
+            return search_tree(root->right, key);
+        return root;
     }
+    return NULL;
+}
 
-    void destruct_tree(struct Node* node)
-    {
-        if (node == NULL)
-            return;
-        if (node->left)
-            destruct_tree(node->left);
-        if (node->right)
-            destruct_tree(node->right);
-        free(node);
-    }
-
-    struct Node* search_tree(struct Node* root, const char* key)
-    {
-        if (root == NULL) return NULL;
-        if (strcasecmp(key, root->data) == 0)
-            return root;
-        if (strcasecmp(key, root->data) < 0)
-        {
-            if (root->left)
-                return search_tree(root->left, key);
-            return root;
-        }
-        if (strcasecmp(key, root->data) > 0)
-        {
-            if (root->right)
-                return search_tree(root->right, key);
-            return root;
-        }
+struct Node* minimum(struct Node* root)
+{
+    if (root == NULL)
         return NULL;
-    }
+    if (root->left == NULL)
+        return root;
+    return minimum(root->left);
+}
 
-    struct Node* minimum(struct Node* root)
-    {
-        if (root == NULL)
-            return NULL;
-        if (root->left == NULL)
-            return root;
-        return minimum(root->left);
-    }
-
-    struct Node* maximum(struct Node* root)
-    {
-        if (root == NULL)
-            return NULL;
-        struct Node* current = root;
-        while (current->right != NULL)
-        {
-            if (current->right == NULL)
-                return current;
-            current = current->right;
-        }
+struct Node* maximum(struct Node* root)
+{
+    if (root == NULL)
         return NULL;
-    }
-
-
-    int get_balance(const struct Node* root)
+    struct Node* current = root;
+    while (current->right != NULL)
     {
-        if (root == NULL)
-            return 0;
-        return height(root->left) - height(root->right);
+        if (current->right == NULL)
+            return current;
+        current = current->right;
     }
+    return NULL;
+}
 
-    struct Node* rotate_right(struct Node* old_root)
-    {
-        struct Node* new_root = old_root->left;
-        struct Node* t2 = new_root->right;
-        new_root->right = old_root;
-        old_root->left = t2;
-        old_root->height = 1 + max(height(old_root->left), height(old_root->right));
-        new_root->height = 1 + max(height(new_root->left), height(new_root->right));
-        return new_root;
-    }
 
-    struct Node* rotate_left(struct Node* old_root)
-    {
-        struct Node* new_root = old_root->right;
-        struct Node* t2 = new_root->left;
+int get_balance(const struct Node* root)
+{
+    if (root == NULL)
+        return 0;
+    return height(root->left) - height(root->right);
+}
 
-        new_root->left = old_root;
-        old_root->right = t2;
+struct Node* rotate_right(struct Node* old_root)
+{
+    struct Node* new_root = old_root->left;
+    struct Node* t2 = new_root->right;
+    new_root->right = old_root;
+    old_root->left = t2;
+    old_root->height = 1 + max(height(old_root->left), height(old_root->right));
+    new_root->height = 1 + max(height(new_root->left), height(new_root->right));
+    return new_root;
+}
 
-        old_root->height = 1 + max(height(old_root->left), height(old_root->right));
-        new_root->height = 1 + max(height(new_root->left), height(new_root->right));
-        return new_root;
-    }
+struct Node* rotate_left(struct Node* old_root)
+{
+    struct Node* new_root = old_root->right;
+    struct Node* t2 = new_root->left;
+
+    new_root->left = old_root;
+    old_root->right = t2;
+
+    old_root->height = 1 + max(height(old_root->left), height(old_root->right));
+    new_root->height = 1 + max(height(new_root->left), height(new_root->right));
+    return new_root;
+}
 
 struct Node* insert_node(struct Node* root, char* data)
-    {
-        if (root == NULL)
-            return construct_tree(data);
-        
-        if (strcasecmp(data, root->data) < 0)
-            root->left = insert_node(root->left, data);
-        else if (strcasecmp(data, root->data) > 0)
-            root->right = insert_node(root->right, data);
-        else
-            return root;
-        
-        root->height = 1 + max(height(root->right), height(root->left));
+{
+    if (root == NULL)
+        return construct_tree(data);
 
-        int balance = get_balance(root);
-        
-        if (balance > 1 && strcasecmp(data, root->left->data) < 0)
-            return rotate_right(root);
-
-        if (balance < -1 && strcasecmp(data, root->right->data) > 0)
-            return rotate_left(root);
-
-        if (balance > 1 && strcasecmp(data, root->left->data) > 0) {
-            root->left = rotate_left(root->left);
-            return rotate_right(root);
-        }
-
-        if (balance < -1 && strcasecmp(data, root->right->data) < 0) {
-            root->right = rotate_right(root->right);
-            return rotate_left(root);
-        }
-
+    if (strcasecmp(data, root->data) < 0)
+        root->left = insert_node(root->left, data);
+    else if (strcasecmp(data, root->data) > 0)
+        root->right = insert_node(root->right, data);
+    else
         return root;
+
+    root->height = 1 + max(height(root->right), height(root->left));
+
+    int balance = get_balance(root);
+
+    if (balance > 1 && strcasecmp(data, root->left->data) < 0)
+        return rotate_right(root);
+
+    if (balance < -1 && strcasecmp(data, root->right->data) > 0)
+        return rotate_left(root);
+
+    if (balance > 1 && strcasecmp(data, root->left->data) > 0)
+    {
+        root->left = rotate_left(root->left);
+        return rotate_right(root);
     }
 
-    struct Node* delete_node(struct Node* root, const char* key)
+    if (balance < -1 && strcasecmp(data, root->right->data) < 0)
     {
-        if (root == NULL)
+        root->right = rotate_right(root->right);
+        return rotate_left(root);
+    }
+
+    return root;
+}
+
+struct Node* delete_node(struct Node* root, const char* key)
+{
+    if (root == NULL)
+        return NULL;
+    if (strcasecmp(key, root->data) > 0)
+        root->right = delete_node(root->right, key);
+    else if (strcasecmp(key, root->data) < 0)
+        root->left = delete_node(root->left, key);
+    else if (strcasecmp(root->data, key) == 0)
+    {
+        if (root->left == NULL && root->right == NULL)
+        {
+            destruct_tree(root);
             return NULL;
-        if (strcasecmp(key, root->data) > 0)
-            root->right = delete_node(root->right, key);
-        else if (strcasecmp(key, root->data) < 0)
-            root->left = delete_node(root->left, key);
-        else if (strcasecmp(root->data , key) == 0)
+        }
+        if (root->right == NULL)
         {
-            if (root->left == NULL && root->right == NULL)
-            {
-                destruct_tree(root);
-                return NULL;
-            }
-            if (root->right == NULL)
-            {
-                struct Node* temp = root->left;
-                free(root);
-                return temp;
-            }
-            if (root->left == NULL)
-            {
-                struct Node* temp = root->right;
-                free(root);
-                return temp;
-            }
-
-            const struct Node* temp = minimum(root->right);
-            if (temp)
-            {
-                root->data = temp->data;
-                root->right = delete_node(root->right, temp->data);
-            }
+            struct Node* temp = root->left;
+            free(root);
+            return temp;
+        }
+        if (root->left == NULL)
+        {
+            struct Node* temp = root->right;
+            free(root);
+            return temp;
         }
 
-        return root;
-    }
-
-    struct Node* predecessor(struct Node* root)
-    {
-        if (root == NULL) return NULL;
-        return maximum(root->left);
-    }
-    struct Node* successor(struct Node* root)
-    {
-        if (root == NULL) return NULL;
-        return minimum(root->right);
-    }
-
-    void print_tree(const struct Node* root)
-    {
-        if (root == NULL)
-            return;
-        if (root->left != NULL)
-            print_tree(root->left);
-        printf("%s \n", root->data);
-        if (root->right != NULL)
-            print_tree(root->right);
-    }
-
-    void toLowerCase(char *str) {
-        for (int i = 0; str[i]; i++)
-            str[i] = tolower((unsigned char)str[i]);
-    }
-
-    int main()
-    {
-        FILE* f = fopen("Dictionary.txt", "r");
-        if (f == NULL) printf("File does not exist\n");
-
-        char temp[100];
-        fscanf(f, "%s", temp);
-        toLowerCase(temp); //TODO MINA LOOK AT THIS I AM CONVERTING TO LOWER AHOO
-        struct Node* treeRoot = construct_tree(temp);
-        char x = 'a';
-
-        while (x != EOF)
+        const struct Node* temp = minimum(root->right);
+        if (temp)
         {
-            fscanf(f, "%s", temp);
-            toLowerCase(temp); //TODO MINA LOOK AT THIS
-            insert_node(treeRoot, temp);
-            x = fgetc(f);
+            root->data = temp->data;
+            root->right = delete_node(root->right, temp->data);
         }
-        fclose(f);
-        
-        char input[200];
-        printf("Enter a sentence: ");
-        fgets(input, 200, stdin);
-        input[strlen(input) - 1] = '\0';
-
-        toLowerCase(input);
-        char* token = strtok(input, " ");
-        while (token != NULL)
-        {
-            struct Node* tempNode = search_tree(treeRoot, token);
-            insert_node(treeRoot, "i");
-            if (strcasecmp(tempNode->data,token) != 0)
-            {
-                printf("Word '%s' -- ", token);   
-                printf("Invalid word -- ");
-                
-                /*
-                struct Node* node = construct_tree(token);
-                FILE* f1 = fopen("Dictionary.txt", "r");
-                if (f1 == NULL) printf("File does not exist\n");
-                x = 'a';
-
-                while (x != EOF)
-                {
-                    fscanf(f1, "%s", temp);
-                    insert_node(node, StrToLower(temp));
-                    x = fgetc(f1);
-                }
-                fclose(f1);
-                */
-                
-                
-                //printf("Suggestions: '%s', '%s', '%s'\n", tempNode->data, predecessor(node)->data, successor(node)->data);
-                printf("Suggestions: '%s'\n", tempNode->data);
-
-            }
-            else
-            {
-                printf("Word '%s' -- ", token);   
-                printf("Valid word\n");
-            }
-            token = strtok(NULL, " ");
-        }
-        
-
-        
-        /*struct Node* root = construct_tree("ahmed");
-        root = insert_node(root, "mina");
-        root = insert_node(root, "rabie");
-        root = insert_node(root, "youssef");
-        root = insert_node(root, "mahmoud");
-        root = insert_node(root, "metawie");
-        print_tree(root);
-        printf("\n");
-        root = delete_node(root, "mina");
-        print_tree(root);
-        destruct_tree(root);*/
-        return 0;
     }
+
+    return root;
+}
+
+struct Node* predecessor(struct Node* root)
+{
+    if (root == NULL) return NULL;
+    return maximum(root->left);
+}
+
+struct Node* successor(struct Node* root)
+{
+    if (root == NULL) return NULL;
+    return minimum(root->right);
+}
+
+void print_tree(const struct Node* root)
+{
+    if (root == NULL)
+        return;
+    if (root->left != NULL)
+        print_tree(root->left);
+    printf("%s \n", root->data);
+    if (root->right != NULL)
+        print_tree(root->right);
+}
+
+void toLowerCase(char* str)
+{
+    for (int i = 0; str[i]; i++)
+        str[i] = tolower((unsigned char)str[i]);
+}
+
+int main()
+{
+    FILE* f = fopen("Dictionary.txt", "r");
+    if (f == NULL)
+    {
+        printf("File does not exist\n");
+        return 1;
+    }
+
+    struct Node* treeRoot = NULL;
+    char temp[100];
+    
+    while (fscanf(f, "%99s", temp) == 1)
+    {
+        toLowerCase(temp);
+        treeRoot = insert_node(treeRoot, temp); 
+    }
+    fclose(f);
+
+    char input[200];
+    printf("Enter a sentence: ");
+    if (fgets(input, sizeof(input), stdin) == NULL)
+    {
+        printf("Error reading input\n");
+        destruct_tree(treeRoot);
+        return 1;
+    }
+    input[strcspn(input, "\n")] = '\0';
+
+    toLowerCase(input);
+    char* token = strtok(input, " ");
+    while (token != NULL)
+    {
+        struct Node* tempNode = search_tree(treeRoot, token);
+        if (tempNode == NULL || strcasecmp(tempNode->data, token) != 0)
+        {
+            printf("Word '%s' -- Invalid word -- ", token);
+            printf("Did you mean '%s'?\n", tempNode->data);
+        }
+        else
+        {
+            printf("Word '%s' -- Valid word\n", token);
+        }
+        token = strtok(NULL, " ");
+    }
+
+    destruct_tree(treeRoot);
+    return 0;
+}
