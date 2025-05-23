@@ -22,7 +22,7 @@ int height(const struct Node* root)
     return root->height;
 }
 
-struct Node* construct_tree(char* data)
+struct Node* construct_tree(const char* data)
 {
     struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
     new_node->data = malloc(strlen(data) + 1);
@@ -253,13 +253,13 @@ struct Node* delete_node(struct Node* root, const char* key)
     return root;
 }
 
-struct Node* predecessor(struct Node* root)
+struct Node* predecessor(const struct Node* root)
 {
     if (root == NULL) return NULL;
     return maximum(root->left);
 }
 
-struct Node* successor(struct Node* root)
+struct Node* successor(const struct Node* root)
 {
     if (root == NULL) return NULL;
     return minimum(root->right);
@@ -276,11 +276,11 @@ void print_tree(const struct Node* root)
         print_tree(root->right);
 }
 
-void toLowerCase(char* str)
-{
-    for (int i = 0; str[i]; i++)
-        str[i] = tolower((unsigned char)str[i]);
-}
+// void toLowerCase(char* str)
+// {
+//     for (int i = 0; str[i]; i++)
+//         str[i] = tolower((unsigned char)str[i]);
+// }
 
 int main()
 {
@@ -295,17 +295,15 @@ int main()
     char temp[100];
 
     while (fscanf(f, "%99s", temp) == 1)
-    {
-        toLowerCase(temp);
         treeRoot = insert_node(treeRoot, temp);
-    }
+
     fclose(f);
 
     char input[200];
     printf("Enter a sentence: ");
     fgets(input, sizeof(input), stdin);
     input[strcspn(input, "\n")] = '\0';
-    toLowerCase(input);
+    // toLowerCase(input);
 
     char* token = strtok(input, " ");
     while (token)
@@ -332,7 +330,6 @@ int main()
 
         token = strtok(NULL, " ");
     }
-
     destruct_tree(treeRoot);
     return 0;
 }
